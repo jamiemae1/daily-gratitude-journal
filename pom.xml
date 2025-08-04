@@ -541,6 +541,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-failsafe-plugin.version}</version>
                     <configuration>
+                        <argLine>@{argLine} -Duser.timezone=UTC -Dspring.profiles.active=${profile.test}</argLine>
                         <!-- Due to spring-boot repackage, without adding this property test classes are not found
                              See https://github.com/spring-projects/spring-boot/issues/6254 -->
                         <!-- Force alphabetical order to have a reproducible build -->
@@ -550,7 +551,6 @@
                             <include>**/*IT*</include>
                             <include>**/*IntTest*</include>
                         </includes>
-                        <argLine>@{argLine} -Dspring.profiles.active=${profile.test}</argLine>
                     </configuration>
                     <executions>
                         <execution>
@@ -564,6 +564,25 @@
                             <goals>
                                 <goal>verify</goal>
                             </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>net.masterthought</groupId>
+                    <artifactId>maven-cucumber-reporting</artifactId>
+                    <version>5.7.4</version>
+                    <executions>
+                        <execution>
+                            <id>generate-cucumber-html-report</id>
+                            <phase>verify</phase> <!-- This ensures it runs after tests -->
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <projectName>Daily Gratitude Journal</projectName>
+                                <outputDirectory>${project.build.directory}/cucumber-reports</outputDirectory>
+                                <cucumberOutput>${project.build.directory}/cucumber-reports/CucumberTestReport.json</cucumberOutput>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -590,6 +609,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
+                        <argLine>-Duser.timezone=UTC</argLine>
                         <!-- Force alphabetical order to have a reproducible build -->
                         <runOrder>alphabetical</runOrder>
                         <excludes>

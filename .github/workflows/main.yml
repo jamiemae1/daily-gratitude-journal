@@ -31,16 +31,11 @@ jobs:
           nohup ./mvnw -Dskip.installnodenpm -Dskip.npm -ntp --batch-mode spring-boot:run &
           npx wait-on http://localhost:8080/management/health
 
-      - name: Run backend test with test profile
-        run: ./mvnw test -Dspring.profiles.active=test
-      - name: Run performance tests
-        run: npm run ci:performance:test
-      - name: Upload Gatling Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: gatling-report
-          path: target/gatling/**
-      - name: Run frontend test
+      - name: Run Backend Tests (JUnit + Spring + Cucumber)
+        run: ./mvnw verify -P integration -Dspring.profiles.active=test
+      - name: Run Frontend Tests (Jest)
+        run: npm run test
+      - name: Build and Run E2E Tests
         run: npm run ci:frontend:test
       - name: Package application
         run: npm run java:jar:prod
@@ -56,3 +51,11 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       - name: 'E2E: Teardown'
         run: npm run ci:e2e:teardown
+
+      - name: Run Performance Tests (Gatling)
+        run: npm run ci:performance:test
+      - name: Upload Gatling Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gatling-report
+          path: target/gatling/**
